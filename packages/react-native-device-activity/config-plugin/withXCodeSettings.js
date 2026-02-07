@@ -4,10 +4,18 @@ const { withXcodeProject } = require("@expo/config-plugins");
 const withXcodeSettings = (config, { appGroup }) => {
   return withXcodeProject(config, (newConfig) => {
     const xcodeProject = newConfig.modResults;
+    const appVersion = newConfig.version;
+    const iosBuildNumber = newConfig.ios?.buildNumber;
 
     const settings = {
       REACT_NATIVE_DEVICE_ACTIVITY_APP_GROUP: appGroup,
     };
+    if (appVersion) {
+      settings.MARKETING_VERSION = appVersion;
+    }
+    if (iosBuildNumber) {
+      settings.CURRENT_PROJECT_VERSION = iosBuildNumber;
+    }
 
     const configurations = xcodeProject.pbxXCBuildConfigurationSection();
 

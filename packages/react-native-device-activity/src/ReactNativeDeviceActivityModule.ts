@@ -32,6 +32,11 @@ const warnFnString = () => {
   return "";
 };
 
+const warnFnNull = () => {
+  console.warn(warnText);
+  return null;
+};
+
 const warnFnActivitySelectionWithMetadata = () => {
   console.warn(warnText);
 
@@ -85,6 +90,7 @@ const mockModule: ReactNativeDeviceActivityNativeModule | null = {
   revokeAuthorization: warnFn,
   isShieldActive: warnFnBoolean,
   getAppGroupFileDirectory: warnFnString,
+  getLatestReportSnapshot: warnFnNull,
   enableBlockAllMode: warnFn,
   disableBlockAllMode: warnFn,
   activities: warnFnArray,

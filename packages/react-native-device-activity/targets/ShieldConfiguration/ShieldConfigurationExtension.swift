@@ -22,7 +22,8 @@ func convertBase64StringToImage(imageBase64String: String?) -> UIImage? {
 }
 
 func buildLabel(text: String?, with color: UIColor?, placeholders: [String: String?])
-  -> ShieldConfiguration.Label? {
+  -> ShieldConfiguration.Label?
+{
   if let text = text {
     let color = color ?? UIColor.label
     return .init(text: replacePlaceholders(text, with: placeholders), color: color)
@@ -68,7 +69,8 @@ func resolveIcon(dict: [String: Any]) -> UIImage? {
 }
 
 func buildShield(placeholders: [String: String?], config: [String: Any]?)
-  -> ShieldConfiguration {
+  -> ShieldConfiguration
+{
 
   if let appGroup = appGroup {
     logger.log("Calling getShieldConfiguration with appgroup: \(appGroup, privacy: .public)")
@@ -138,7 +140,7 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
       "tokenType": "application",
       "familyActivitySelectionId": getPossibleFamilyActivitySelectionIds(
         applicationToken: application.token
-      ).first?.id
+      ).first?.id,
     ]
 
     return buildShield(
@@ -148,7 +150,8 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
   }
 
   override func configuration(shielding application: Application, in category: ActivityCategory)
-    -> ShieldConfiguration {
+    -> ShieldConfiguration
+  {
 
     logger.log("shielding application category")
 
@@ -166,7 +169,7 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
       "familyActivitySelectionId": getPossibleFamilyActivitySelectionIds(
         applicationToken: application.token,
         categoryToken: category.token
-      ).first?.id
+      ).first?.id,
     ]
 
     return buildShield(
@@ -190,7 +193,7 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
       "tokenType": "web_domain",
       "familyActivitySelectionId": getPossibleFamilyActivitySelectionIds(
         webDomainToken: webDomain.token
-      ).first?.id
+      ).first?.id,
     ]
 
     return buildShield(
@@ -200,7 +203,8 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
   }
 
   override func configuration(shielding webDomain: WebDomain, in category: ActivityCategory)
-    -> ShieldConfiguration {
+    -> ShieldConfiguration
+  {
 
     logger.log("shielding web domain category")
 
@@ -218,7 +222,7 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
       "familyActivitySelectionId": getPossibleFamilyActivitySelectionIds(
         webDomainToken: webDomain.token,
         categoryToken: category.token
-      ).first?.id
+      ).first?.id,
     ]
 
     return buildShield(

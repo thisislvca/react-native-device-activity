@@ -39,9 +39,11 @@ android.iml
 # Cocoapods
 #
 example/ios/Pods
+apps/example/ios/Pods
 
 # Ruby
 example/vendor/
+apps/example/vendor/
 
 # node.js
 #
@@ -82,6 +84,18 @@ web-build/
 
 # Metro
 .metro-health-check*
+
+# Expo prebuild artifacts (example app, generated and not committed)
+apps/example/ios/reactnativedeviceactivityexample/Images.xcassets/SplashScreenBackground.colorset/
+apps/example/ios/reactnativedeviceactivityexample/Images.xcassets/SplashScreenLogo.imageset/
+apps/example/ios/reactnativedeviceactivityexample/PrivacyInfo.xcprivacy
+apps/example/targets/ActivityMonitorExtension/DeviceActivityMonitorExtension.swift
+apps/example/targets/ActivityMonitorExtension/Shared.swift
+apps/example/targets/ShieldAction/ShieldActionExtension.swift
+apps/example/targets/ShieldAction/Shared.swift
+apps/example/targets/ShieldConfiguration/ShieldConfigurationExtension.swift
+apps/example/targets/ShieldConfiguration/Shared.swift
+apps/example/targets/DeviceActivityReportExtension/generated.entitlements
 
 # debug
 npm-debug.*

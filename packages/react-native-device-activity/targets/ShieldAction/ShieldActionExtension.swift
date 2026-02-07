@@ -197,7 +197,7 @@ func handleAction(
           ? WebDomain(
             token: webdomainToken!
           ).domain : nil,
-        "familyActivitySelectionId": familyActivitySelectionId?.id
+        "familyActivitySelectionId": familyActivitySelectionId?.id,
       ]
 
       let response = handleShieldAction(

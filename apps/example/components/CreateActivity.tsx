@@ -1,12 +1,14 @@
 import { requestPermissionsAsync } from "expo-notifications";
 import { useCallback, useState } from "react";
-import { NativeSyntheticEvent, View } from "react-native";
+import { NativeSyntheticEvent, Pressable, View } from "react-native";
 import * as ReactNativeDeviceActivity from "react-native-device-activity";
 import {
   DeviceActivityEvent,
   DeviceActivitySelectionEvent,
 } from "react-native-device-activity/src/ReactNativeDeviceActivity.types";
 import { Button, Text, TextInput, Title, useTheme } from "react-native-paper";
+
+import { ActivityPicker } from "./ActivityPicker";
 
 const trackEveryXMinutes = 10;
 
@@ -18,10 +20,10 @@ const startMonitoring = async (
 ) => {
   await requestPermissionsAsync();
 
-  // ReactNativeDeviceActivity.setFamilyActivitySelectionId({
-  //  id: activityName,
-  //  familyActivitySelection: activitySelection,
-  // });
+  ReactNativeDeviceActivity.setFamilyActivitySelectionId({
+    id: activityName,
+    familyActivitySelection: activitySelection,
+  });
 
   const events: DeviceActivityEvent[] = [
     /*  {
@@ -80,40 +82,10 @@ const startMonitoring = async (
       callbackName: "eventDidReachThreshold",
       eventName,
       actions: [
-        /*{
+        {
           type: "blockSelection",
           familyActivitySelectionId: activityName,
-          shieldActions: {
-            primary: { type: "unblockAll", behavior: "defer" },
-            secondary: { type: "dismiss", behavior: "close" },
-          },
-          shieldConfiguration: {
-            backgroundBlurStyle: UIBlurEffectStyle.prominent,
-            title:
-              "{applicationOrDomainDisplayName} Blocked by react-native-device-activity",
-            subtitle: "You have reached your limit! {activityName}",
-            primaryButtonLabel: "Give me 5 more minutes",
-            secondaryButtonLabel: "Close",
-            titleColor: {
-              red: 255,
-              green: 0.329 * 255,
-              blue: 0,
-              alpha: 1,
-            },
-            subtitleColor: {
-              red: 255,
-              green: 0.329 * 255,
-              blue: 0,
-              alpha: 1,
-            },
-            primaryButtonBackgroundColor: {
-              red: 255,
-              green: 0.329 * 255,
-              blue: 0,
-              alpha: 1,
-            },
-          },
-        },*/
+        },
         {
           type: "sendHttpRequest",
           url: "https://webhook.site/df7583bc-fba5-4080-8a04-7417bccb2030",
@@ -161,6 +133,7 @@ export const CreateActivity = ({ onDismiss }: { onDismiss: () => void }) => {
 
   const [familyActivitySelectionResult, setFamilyActivitySelectionResult] =
     useState<DeviceActivitySelectionEvent | null>(null);
+  const [pickerVisible, setPickerVisible] = useState(false);
 
   const onSelectionChange = useCallback(
     (event: NativeSyntheticEvent<DeviceActivitySelectionEvent>) => {
@@ -187,33 +160,19 @@ export const CreateActivity = ({ onDismiss }: { onDismiss: () => void }) => {
           marginVertical: 10,
         }}
       >
-        <ReactNativeDeviceActivity.DeviceActivitySelectionView
+        <Pressable
+          onPress={() => setPickerVisible(true)}
           style={{
             width: 100,
             height: 40,
             borderRadius: 20,
-            borderWidth: 10,
-            borderColor: theme.colors.primary,
+            backgroundColor: theme.colors.primary,
+            alignItems: "center",
+            justifyContent: "center",
           }}
-          headerText="a header text!"
-          footerText="a footer text!"
-          onSelectionChange={onSelectionChange}
-          familyActivitySelection={
-            familyActivitySelectionResult?.familyActivitySelection
-          }
         >
-          <View
-            pointerEvents="none"
-            style={{
-              backgroundColor: theme.colors.primary,
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text style={{ color: "white" }}>Select apps</Text>
-          </View>
-        </ReactNativeDeviceActivity.DeviceActivitySelectionView>
+          <Text style={{ color: "white" }}>Select apps</Text>
+        </Pressable>
         <Text>
           {familyActivitySelectionResult &&
           familyActivitySelectionResult?.categoryCount < 13
@@ -232,8 +191,8 @@ export const CreateActivity = ({ onDismiss }: { onDismiss: () => void }) => {
       <Button
         mode="contained"
         disabled={!familyActivitySelectionResult || !activityName}
-        onPress={() => {
-          void startMonitoring(
+        onPress={async () => {
+          await startMonitoring(
             familyActivitySelectionResult?.familyActivitySelection ?? "",
             activityName,
           );
@@ -242,6 +201,20 @@ export const CreateActivity = ({ onDismiss }: { onDismiss: () => void }) => {
       >
         Start Monitoring
       </Button>
+      <ActivityPicker
+        visible={pickerVisible}
+        onDismiss={() => setPickerVisible(false)}
+        onSelectionChange={onSelectionChange}
+        familyActivitySelection={
+          familyActivitySelectionResult?.familyActivitySelection ?? undefined
+        }
+        onReload={() => {
+          setPickerVisible(false);
+          setTimeout(() => {
+            setPickerVisible(true);
+          }, 100);
+        }}
+      />
     </View>
   );
 };

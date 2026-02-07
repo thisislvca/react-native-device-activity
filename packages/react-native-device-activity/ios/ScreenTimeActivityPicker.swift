@@ -37,13 +37,11 @@ struct ActivityPicker: View {
         footerText: model.footerText,
         selection: $model.activitySelection
       )
-      .allowsHitTesting(false)
       .background(Color.clear)
     } else {
       FamilyActivityPicker(
         selection: $model.activitySelection
       )
-      .allowsHitTesting(false)
       .background(Color.clear)
     }
   }

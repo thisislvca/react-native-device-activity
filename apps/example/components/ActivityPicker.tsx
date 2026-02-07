@@ -1,4 +1,4 @@
-import { Pressable, Text, View, NativeSyntheticEvent } from "react-native";
+import { View, NativeSyntheticEvent } from "react-native";
 import {
   ActivitySelectionMetadata,
   ActivitySelectionWithMetadata,
@@ -6,25 +6,6 @@ import {
   DeviceActivitySelectionViewPersisted,
 } from "react-native-device-activity";
 import { Modal, Portal } from "react-native-paper";
-
-const CrashView = ({ onReload }: { onReload: () => void }) => {
-  return (
-    <Pressable
-      style={{
-        flex: 1,
-        position: "absolute",
-        height: 600,
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "white",
-      }}
-      onPress={onReload}
-    >
-      <Text>Swift view crash - tap to reload</Text>
-    </Pressable>
-  );
-};
 
 export const ActivityPicker = ({
   visible,
@@ -56,8 +37,6 @@ export const ActivityPicker = ({
             height: 600,
           }}
         >
-          <CrashView onReload={onReload} />
-
           {visible && (
             <DeviceActivitySelectionView
               style={{
@@ -65,7 +44,6 @@ export const ActivityPicker = ({
                 height: 600,
                 width: "100%",
                 backgroundColor: "transparent",
-                pointerEvents: "none",
               }}
               headerText="a header text!"
               footerText="a footer text!"
@@ -112,8 +90,6 @@ export const ActivityPickerPersisted = ({
             height: 600,
           }}
         >
-          <CrashView onReload={onReload} />
-
           {visible && (
             <DeviceActivitySelectionViewPersisted
               style={{
@@ -121,7 +97,6 @@ export const ActivityPickerPersisted = ({
                 height: 600,
                 width: "100%",
                 backgroundColor: "transparent",
-                pointerEvents: "none",
               }}
               headerText="a header text!"
               footerText="a footer text!"

@@ -45,7 +45,7 @@ class TextReplacementTests: XCTestCase {
     let input: [String: Any] = [
       "greeting": "Hello {name}!",
       "auth": "{userDefaults:AUTH_HEADER}",
-      "score": "{asNumber:points}"
+      "score": "{asNumber:points}",
     ]
     let placeholders = ["name": "Alice", "points": "100"]
     let result = replacePlaceholdersInObject(input, with: placeholders)
@@ -59,7 +59,7 @@ class TextReplacementTests: XCTestCase {
     let input: [String: Any] = [
       "name": "Hello {username}!",
       "age": 25,
-      "isActive": true
+      "isActive": true,
     ]
     let placeholders = ["username": "Bob"]
     let result = replacePlaceholdersInObject(input, with: placeholders)
@@ -73,7 +73,7 @@ class TextReplacementTests: XCTestCase {
     let input: [String: Any] = [
       "name": "Hello {username}!",
       "auth": "{userDefaults:NON_EXISTENT_KEY}",
-      "score": "{asNumber:missingValue}"
+      "score": "{asNumber:missingValue}",
     ]
     let placeholders: [String: String] = [:]
     let result = replacePlaceholdersInObject(input, with: placeholders)

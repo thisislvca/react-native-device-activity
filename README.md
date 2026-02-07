@@ -16,6 +16,7 @@ React Native wrapper for Apple's Screen Time, Device Activity, and Family Contro
   - [ShieldConfiguration API](#shieldconfiguration-api)
   - [ShieldAction API](#shieldaction-api)
   - [ActivityMonitor API](#activitymonitor-api)
+  - [DeviceActivityReport API](#deviceactivityreport-api)
 - [Installation in managed Expo projects](#installation-in-managed-expo-projects)
   - [Some Notes](#some-notes)
   - [Data model](#data-model)
@@ -99,6 +100,13 @@ ReactNativeDeviceActivity.startMonitoring(
 );
 ```
 
+### DeviceActivityReport API
+
+Renders Screen Time reports and allows your app to read a compact snapshot of the latest report output.
+
+**What it does**: Presents native Screen Time report UI and persists report summary data in the app group.
+**Example**: Render a weekly report for a selected set of apps and fetch the latest aggregated totals.
+
 ## Installation in managed Expo projects
 
 1. Install the package:
@@ -142,6 +150,7 @@ ReactNativeDeviceActivity.startMonitoring(
 - `ActivityMonitorExtension`
 - `ShieldAction`
 - `ShieldConfiguration`
+- `DeviceActivityReportExtension` (required for report rendering and snapshots)
 
 ### Some Notes
 
@@ -183,6 +192,7 @@ For every base bundleIdentifier you need approval for 4 bundleIdentifiers (when 
 - `com.your-bundleIdentifier.ActivityMonitor`
 - `com.your-bundleIdentifier.ShieldAction`
 - `com.your-bundleIdentifier.ShieldConfiguration`
+- `com.your-bundleIdentifier.DeviceActivityReportExtension` (if using reports)
 
 Once you've gotten approval you need to manually add the "Family Controls (Distribution)" under Additional Capabilities for each of the bundleIdentifiers on [developer.apple.com](https://developer.apple.com/account/resources/identifiers/list) mentioned above. If you use Expo/EAS this has to be done only once, and after that provisioning will be handled automatically.
 
@@ -544,6 +554,42 @@ const AppBlocker = () => {
 
 For a complete implementation, see the [example app](https://github.com/Kingstinct/react-native-device-activity/tree/main/example).
 
+## Report View + Snapshot API (iOS 16+)
+
+Reports are an additive feature and require iOS 16+.
+
+- Core API support remains iOS 15+ (`isAvailable()`).
+- Report UI and snapshots require iOS 16+ (`isReportAvailable()`).
+
+```TypeScript
+import * as ReactNativeDeviceActivity from "react-native-device-activity";
+
+const reportAvailable = ReactNativeDeviceActivity.isReportAvailable();
+
+// Render native report UI
+<ReactNativeDeviceActivity.DeviceActivityReportView
+  context="totalActivity"
+  familyActivitySelection={familyActivitySelection}
+  from={Date.now() / 1000 - 7 * 24 * 60 * 60}
+  to={Date.now() / 1000}
+  segmentation="daily"
+  users="all"
+  style={{ height: 280 }}
+/>;
+
+// Read latest snapshot written by the report extension
+const snapshot = await ReactNativeDeviceActivity.getLatestReportSnapshot({
+  context: "totalActivity",
+});
+```
+
+Snapshot payload fields:
+
+- `context`, `generatedAt`, `from`, `to`, `segmentation`
+- `totalActivityDurationSeconds`, `totalPickups`, `totalNotifications`
+- `applications[]`, `categories[]`
+- `version` (currently `1`)
+
 ## API Reference (the list is not exhaustive yet please refer to the TypeScript types for the full list)
 
 ### Components
@@ -551,6 +597,7 @@ For a complete implementation, see the [example app](https://github.com/Kingstin
 | Component                     | Props                                                                                                   | Description                                        |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
 | `DeviceActivitySelectionView` | `familyActivitySelection`: string \| null<br>`onSelectionChange`: (event) => void<br>`style`: ViewStyle | Native component that renders the app selection UI |
+| `DeviceActivityReportView`    | `context?`: string<br>`familyActivitySelection?`: string \| null<br>`from?`: number<br>`to?`: number<br>`segmentation?`: `"hourly" \| "daily" \| "weekly"`<br>`devices?`: enum[] \| null<br>`users?`: `"all" \| "children" \| null`<br>`style?`: ViewStyle | Native component that renders Screen Time reports (iOS 16+) |
 
 ### Hooks
 
@@ -569,6 +616,8 @@ For a complete implementation, see the [example app](https://github.com/Kingstin
 | `updateShield`                 | `config`: ShieldConfiguration<br>`actions`: ShieldActions                                       | void                  | Update the shield UI and actions                |
 | `configureActions`             | `{ activityName: string, callbackName: string, actions: Action[] }`                             | void                  | Configure actions for monitor events            |
 | `getEvents`                    | None                                                                                            | DeviceActivityEvent[] | Get history of triggered events                 |
+| `isReportAvailable`            | None                                                                                            | boolean               | Check if report features are available (iOS 16+) |
+| `getLatestReportSnapshot`      | `{ context?: string }`                                                                          | `DeviceActivityReportSnapshot \| null` | Read latest aggregated report snapshot from app group |
 | `userDefaultsSet`              | `key`: string<br>`value`: any                                                                   | void                  | Store value in shared UserDefaults              |
 | `userDefaultsGet`              | `key`: string                                                                                   | any                   | Retrieve value from shared UserDefaults         |
 

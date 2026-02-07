@@ -133,7 +133,8 @@ struct DeviceActivityEventFromJS: ExpoModulesCore.Record {
   var includesPastActivity: Bool?
 }
 
-func convertToSwiftDateComponents(from dateComponentsFromJS: DateComponentsFromJS) -> DateComponents {
+func convertToSwiftDateComponents(from dateComponentsFromJS: DateComponentsFromJS) -> DateComponents
+{
   var swiftDateComponents = DateComponents()
 
   if let era = dateComponentsFromJS.era {
@@ -213,7 +214,8 @@ class NativeEventObserver {
           _: CFDictionary?
         ) in
         if let observer = observer, let name = name {
-          let nativeObserver = Unmanaged<NativeEventObserver>.fromOpaque(observer).takeUnretainedValue()
+          let nativeObserver = Unmanaged<NativeEventObserver>.fromOpaque(observer)
+            .takeUnretainedValue()
           guard let module = nativeObserver.module else {
             return
           }
@@ -422,6 +424,16 @@ public class ReactNativeDeviceActivityModule: Module {
       if let userDefaults = userDefaults {
         return userDefaults.dictionaryRepresentation()
       }
+      return nil
+    }
+
+    AsyncFunction("getLatestReportSnapshot") { (context: String?) -> [String: Any]? in
+      if #available(iOS 16.0, *) {
+        let resolvedContext = sanitizeDeviceActivityReportContext(context)
+        let key = deviceActivityReportSnapshotKey(context: resolvedContext)
+        return deserializeDeviceActivityReportSnapshot(rawValue: userDefaults?.object(forKey: key))
+      }
+
       return nil
     }
 
@@ -843,6 +855,43 @@ public class ReactNativeDeviceActivityModule: Module {
 
       Prop("headerText") { (view: ReactNativeDeviceActivityView, prop: String?) in
         view.model.headerText = prop
+      }
+    }
+
+  }
+}
+
+public class DeviceActivityReportViewModule: Module {
+  public func definition() -> ExpoModulesCore.ModuleDefinition {
+    Name("DeviceActivityReportView")
+
+    View(DeviceActivityReportView.self) {
+      Prop("familyActivitySelection") { (view: DeviceActivityReportView, prop: String?) in
+        view.setFamilyActivitySelection(prop)
+      }
+
+      Prop("context") { (view: DeviceActivityReportView, prop: String?) in
+        view.setContext(prop)
+      }
+
+      Prop("from") { (view: DeviceActivityReportView, prop: Double?) in
+        view.setFrom(prop)
+      }
+
+      Prop("to") { (view: DeviceActivityReportView, prop: Double?) in
+        view.setTo(prop)
+      }
+
+      Prop("segmentation") { (view: DeviceActivityReportView, prop: String?) in
+        view.setSegmentation(prop)
+      }
+
+      Prop("devices") { (view: DeviceActivityReportView, prop: [Int]?) in
+        view.setDevices(prop)
+      }
+
+      Prop("users") { (view: DeviceActivityReportView, prop: String?) in
+        view.setUsers(prop)
       }
     }
   }

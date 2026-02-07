@@ -23,6 +23,53 @@ export type EventParsed = {
 
 export type EventsLookup = Record<string, number>;
 
+export enum DeviceActivityReportViewDevice {
+  iPad = 0,
+  iPhone = 1,
+  iPod = 2,
+  mac = 3,
+}
+
+export type DeviceActivityReportSegmentation = "hourly" | "daily" | "weekly";
+
+export type DeviceActivityReportSnapshotApplication = {
+  bundleIdentifier?: string;
+  localizedDisplayName?: string;
+  durationSeconds: number;
+  pickups: number;
+  notifications: number;
+};
+
+export type DeviceActivityReportSnapshotCategory = {
+  localizedDisplayName?: string;
+  durationSeconds: number;
+};
+
+export type DeviceActivityReportSnapshot = {
+  context: string;
+  generatedAt: string;
+  from: number;
+  to: number;
+  segmentation: DeviceActivityReportSegmentation;
+  totalActivityDurationSeconds: number;
+  totalPickups: number;
+  totalNotifications: number;
+  applications: DeviceActivityReportSnapshotApplication[];
+  categories: DeviceActivityReportSnapshotCategory[];
+  version: 1;
+};
+
+export type DeviceActivityReportViewProps = PropsWithChildren<{
+  style?: StyleProp<ViewStyle>;
+  familyActivitySelection?: string | null;
+  context?: string;
+  from?: number | null;
+  to?: number | null;
+  segmentation?: DeviceActivityReportSegmentation;
+  devices?: DeviceActivityReportViewDevice[] | null;
+  users?: "all" | "children" | null;
+}>;
+
 export type ActivitySelectionMetadata = {
   applicationCount: number;
   categoryCount: number;
@@ -400,6 +447,12 @@ export type ReactNativeDeviceActivityNativeModule = {
   userDefaultsAll: () => Record<string, any>;
   getAppGroupFileDirectory: () => string;
   userDefaultsClearWithPrefix: (prefix: string) => void;
+  getLatestReportSnapshot: (
+    context?: string | null,
+  ) =>
+    | PromiseLike<DeviceActivityReportSnapshot | null>
+    | DeviceActivityReportSnapshot
+    | null;
   // metadata and set functions
   activitySelectionMetadata: (
     familyActivitySelection: ActivitySelectionInputWithBlocks,
