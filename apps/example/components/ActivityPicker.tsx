@@ -1,18 +1,40 @@
-import { View, NativeSyntheticEvent } from "react-native";
+import React from "react";
+import { Modal, NativeSyntheticEvent, StyleSheet, View } from "react-native";
 import {
   ActivitySelectionMetadata,
   ActivitySelectionWithMetadata,
   DeviceActivitySelectionView,
   DeviceActivitySelectionViewPersisted,
 } from "react-native-device-activity";
-import { Modal, Portal } from "react-native-paper";
+
+const PickerSheet = ({
+  visible,
+  onDismiss,
+  children,
+}: {
+  visible: boolean;
+  onDismiss: () => void;
+  children: React.ReactNode;
+}) => {
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={onDismiss}
+      onDismiss={onDismiss}
+    >
+      <View style={styles.container}>{children}</View>
+    </Modal>
+  );
+};
 
 export const ActivityPicker = ({
   visible,
   onDismiss,
   onSelectionChange,
   familyActivitySelection,
-  onReload,
+  onReload: _onReload,
 }: {
   visible: boolean;
   onDismiss: () => void;
@@ -23,37 +45,15 @@ export const ActivityPicker = ({
   onReload: () => void;
 }) => {
   return (
-    <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={onDismiss}
-        contentContainerStyle={{
-          height: 600,
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            height: 600,
-          }}
-        >
-          {visible && (
-            <DeviceActivitySelectionView
-              style={{
-                flex: 1,
-                height: 600,
-                width: "100%",
-                backgroundColor: "transparent",
-              }}
-              headerText="a header text!"
-              footerText="a footer text!"
-              onSelectionChange={onSelectionChange}
-              familyActivitySelection={familyActivitySelection}
-            />
-          )}
-        </View>
-      </Modal>
-    </Portal>
+    <PickerSheet visible={visible} onDismiss={onDismiss}>
+      {visible && (
+        <DeviceActivitySelectionView
+          style={styles.picker}
+          onSelectionChange={onSelectionChange}
+          familyActivitySelection={familyActivitySelection}
+        />
+      )}
+    </PickerSheet>
   );
 };
 
@@ -62,7 +62,7 @@ export const ActivityPickerPersisted = ({
   onDismiss,
   onSelectionChange,
   familyActivitySelectionId,
-  onReload,
+  onReload: _onReload,
   includeEntireCategory,
 }: {
   visible: boolean;
@@ -76,37 +76,26 @@ export const ActivityPickerPersisted = ({
   includeEntireCategory?: boolean;
 }) => {
   return (
-    <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={onDismiss}
-        contentContainerStyle={{
-          height: 600,
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            height: 600,
-          }}
-        >
-          {visible && (
-            <DeviceActivitySelectionViewPersisted
-              style={{
-                flex: 1,
-                height: 600,
-                width: "100%",
-                backgroundColor: "transparent",
-              }}
-              headerText="a header text!"
-              footerText="a footer text!"
-              onSelectionChange={onSelectionChange}
-              familyActivitySelectionId={familyActivitySelectionId}
-              includeEntireCategory={includeEntireCategory}
-            />
-          )}
-        </View>
-      </Modal>
-    </Portal>
+    <PickerSheet visible={visible} onDismiss={onDismiss}>
+      {visible && (
+        <DeviceActivitySelectionViewPersisted
+          style={styles.picker}
+          onSelectionChange={onSelectionChange}
+          familyActivitySelectionId={familyActivitySelectionId}
+          includeEntireCategory={includeEntireCategory}
+        />
+      )}
+    </PickerSheet>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "transparent",
+    flex: 1,
+  },
+  picker: {
+    flex: 1,
+    width: "100%",
+  },
+});

@@ -30,11 +30,21 @@ class ScreenTimeSelectAppsModel: ObservableObject {
 struct ActivityPicker: View {
   @ObservedObject var model: ScreenTimeSelectAppsModel
 
+  private var resolvedHeaderText: String? {
+    let trimmed = model.headerText?.trimmingCharacters(in: .whitespacesAndNewlines)
+    return (trimmed?.isEmpty == false) ? trimmed : nil
+  }
+
+  private var resolvedFooterText: String? {
+    let trimmed = model.footerText?.trimmingCharacters(in: .whitespacesAndNewlines)
+    return (trimmed?.isEmpty == false) ? trimmed : nil
+  }
+
   var body: some View {
-    if #available(iOS 16.0, *) {
+    if #available(iOS 16.0, *), resolvedHeaderText != nil || resolvedFooterText != nil {
       FamilyActivityPicker(
-        headerText: model.headerText,
-        footerText: model.footerText,
+        headerText: resolvedHeaderText,
+        footerText: resolvedFooterText,
         selection: $model.activitySelection
       )
       .background(Color.clear)
