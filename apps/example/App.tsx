@@ -3,6 +3,7 @@ import { PaperProvider, BottomNavigation } from "react-native-paper";
 
 import { AllTheThings } from "./screens/AllTheThings";
 import { EventsTab } from "./screens/Events";
+import { ReportsTab } from "./screens/Reports";
 import { SetOpsTab } from "./screens/SetOps";
 import { Settings } from "./screens/Settings";
 import { SimpleTab } from "./screens/SimpleTab";
@@ -19,6 +20,7 @@ export default function App() {
     },
     { key: "events", title: "Events", focusedIcon: "album" },
     { key: "all", title: "All", focusedIcon: "album" },
+    { key: "reports", title: "Reports", focusedIcon: "chart-bar" },
     { key: "shield", title: "Set ops", focusedIcon: "history" },
     { key: "whitelist", title: "Whitelist", focusedIcon: "history" },
     {
@@ -33,6 +35,7 @@ export default function App() {
     activities: SimpleTab,
     events: EventsTab,
     all: AllTheThings,
+    reports: ReportsTab,
     shield: SetOpsTab,
     whitelist: WhiteListTab,
     settings: Settings,

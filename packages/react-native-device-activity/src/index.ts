@@ -2,6 +2,7 @@ import { EventEmitter, EventSubscription } from "expo-modules-core";
 import { useCallback, useEffect, useState } from "react";
 import { Platform } from "react-native";
 
+import DeviceActivityReportView from "./DeviceActivityReport";
 import DeviceActivitySelectionView from "./DeviceActivitySelectionView";
 import DeviceActivitySelectionViewPersisted from "./DeviceActivitySelectionViewPersisted";
 import {
@@ -17,6 +18,7 @@ import {
   DeviceActivityEvent,
   DeviceActivityEventRaw,
   DeviceActivityMonitorEventPayload,
+  DeviceActivityReportSnapshot,
   DeviceActivitySchedule,
   DeviceActivitySelectionViewPersistedProps,
   DeviceActivitySelectionViewProps,
@@ -649,7 +651,38 @@ export function isAvailable(): boolean {
   );
 }
 
-export { DeviceActivitySelectionView, DeviceActivitySelectionViewPersisted };
+export function isReportAvailable(): boolean {
+  return (
+    Platform.OS === "ios" &&
+    parseInt(Platform.Version, 10) >= 16 &&
+    !!ReactNativeDeviceActivityModule
+  );
+}
+
+export async function getLatestReportSnapshot({
+  context,
+}: {
+  context?: string;
+} = {}): Promise<DeviceActivityReportSnapshot | null> {
+  if (!isReportAvailable()) {
+    return null;
+  }
+
+  const snapshot =
+    await ReactNativeDeviceActivityModule?.getLatestReportSnapshot(context);
+
+  if (!snapshot) {
+    return null;
+  }
+
+  return snapshot as DeviceActivityReportSnapshot;
+}
+
+export {
+  DeviceActivityReportView,
+  DeviceActivitySelectionView,
+  DeviceActivitySelectionViewPersisted,
+};
 
 export type {
   DeviceActivitySelectionViewProps as ReactNativeDeviceActivityViewProps,

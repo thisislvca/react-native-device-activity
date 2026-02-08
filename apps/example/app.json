@@ -80,6 +80,14 @@
                     "com.apple.developer.family-controls": true,
                     "com.apple.security.application-groups": ["group.ActivityMonitor"]
                   }
+                },
+                {
+                  "targetName": "DeviceActivityReportExtension",
+                  "bundleIdentifier": "expo.modules.deviceactivity.example.DeviceActivityReportExtension",
+                  "entitlements": {
+                    "com.apple.developer.family-controls": true,
+                    "com.apple.security.application-groups": ["group.ActivityMonitor"]
+                  }
                 }
               ]
             }

@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 const fs = require("fs");
+const path = require("path");
 
 /** @type {import('@expo/config-plugins').ConfigPlugin<{ appGroup: string; copyToTargetFolder?: boolean }>} */
 const withCopyTargetFolder = (config, { copyToTargetFolder = true }) => {
@@ -26,10 +27,19 @@ const withCopyTargetFolder = (config, { copyToTargetFolder = true }) => {
     withFileTypes: false,
   });
 
+  const targetsNeedingSharedFile = new Set([
+    "ActivityMonitorExtension",
+    "ShieldAction",
+    "ShieldConfiguration",
+  ]);
+
   for (const nativeTarget of nativeTargets) {
     const targetPath = projectTargetFolderPath + "/" + nativeTarget;
     // check if is directory
-    if (fs.lstatSync(targetPath).isDirectory()) {
+    if (
+      fs.lstatSync(targetPath).isDirectory() &&
+      targetsNeedingSharedFile.has(path.basename(targetPath))
+    ) {
       fs.cpSync(sharedFilePath, targetPath + "/Shared.swift");
     }
   }

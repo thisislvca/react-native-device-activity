@@ -21,6 +21,9 @@ let CURRENT_BLOCKLIST_KEY = "currentBlockedSelection"
 let CURRENT_WHITELIST_KEY = "currentUnblockedSelection"
 let IS_BLOCKING_ALL = "isBlockingAll"
 let FAMILY_ACTIVITY_SELECTION_ID_KEY = "familyActivitySelectionIds"
+let DEVICE_ACTIVITY_REPORT_SNAPSHOT_KEY_PREFIX = "deviceActivityReportSnapshot"
+let DEVICE_ACTIVITY_REPORT_VIEW_STATE_KEY_PREFIX = "deviceActivityReportViewState"
+let DEFAULT_DEVICE_ACTIVITY_REPORT_CONTEXT = "totalActivity"
 
 let appGroup =
   Bundle.main.object(forInfoDictionaryKey: "REACT_NATIVE_DEVICE_ACTIVITY_APP_GROUP") as? String
@@ -90,6 +93,82 @@ func openUrl(urlString: String) {
 }
 
 let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
+
+func deviceActivityReportSnapshotKey(context: String) -> String {
+  "\(DEVICE_ACTIVITY_REPORT_SNAPSHOT_KEY_PREFIX)_\(context)"
+}
+
+func deviceActivityReportViewStateKey(context: String) -> String {
+  "\(DEVICE_ACTIVITY_REPORT_VIEW_STATE_KEY_PREFIX)_\(context)"
+}
+
+func sanitizeDeviceActivityReportContext(_ context: String?) -> String {
+  let trimmedContext = context?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+  return trimmedContext.isEmpty ? DEFAULT_DEVICE_ACTIVITY_REPORT_CONTEXT : trimmedContext
+}
+
+func normalizedDeviceActivityReportDateRange(from: Double?, to: Double?) -> (Date, Date) {
+  let now = Date()
+  let startOfDay = Calendar.current.startOfDay(for: now)
+
+  var fromDate =
+    from.flatMap({ value in
+      guard value.isFinite else {
+        return nil
+      }
+      return Date(timeIntervalSince1970: value)
+    }) ?? startOfDay
+
+  var toDate =
+    to.flatMap({ value in
+      guard value.isFinite else {
+        return nil
+      }
+      return Date(timeIntervalSince1970: value)
+    }) ?? now
+
+  if fromDate > toDate {
+    swap(&fromDate, &toDate)
+  }
+
+  if fromDate == toDate {
+    toDate = fromDate.addingTimeInterval(1)
+  }
+
+  return (fromDate, toDate)
+}
+
+@available(iOS 16.0, *)
+func deviceActivityReportDevicesFromRawValues(_ rawValues: [Int]?) -> DeviceActivityFilter.Devices {
+  let resolvedModels = (rawValues ?? []).compactMap { rawValue in
+    DeviceActivityData.Device.Model(rawValue: rawValue)
+  }
+
+  if resolvedModels.isEmpty {
+    return .all
+  }
+
+  return .init(Set(resolvedModels))
+}
+
+func deserializeDeviceActivityReportSnapshot(rawValue: Any?) -> [String: Any]? {
+  if let snapshotDictionary = rawValue as? [String: Any] {
+    return snapshotDictionary
+  }
+
+  if let snapshotData = rawValue as? Data,
+    let snapshotDictionary = try? JSONSerialization.jsonObject(with: snapshotData) as? [String: Any] {
+    return snapshotDictionary
+  }
+
+  if let snapshotString = rawValue as? String,
+    let snapshotData = snapshotString.data(using: .utf8),
+    let snapshotDictionary = try? JSONSerialization.jsonObject(with: snapshotData) as? [String: Any] {
+    return snapshotDictionary
+  }
+
+  return nil
+}
 
 func notifyAppWithName(name: String) {
   let notificationName = CFNotificationName(name as CFString)
@@ -733,9 +812,12 @@ func deserializeFamilyActivitySelection(familyActivitySelectionStr: String)
   var activitySelection = FamilyActivitySelection()
 
   let decoder = JSONDecoder()
-  let data = Data(base64Encoded: familyActivitySelectionStr)
+  guard let data = Data(base64Encoded: familyActivitySelectionStr) else {
+    logger.log("decode error invalid base64 family activity selection")
+    return activitySelection
+  }
   do {
-    activitySelection = try decoder.decode(FamilyActivitySelection.self, from: data!)
+    activitySelection = try decoder.decode(FamilyActivitySelection.self, from: data)
   } catch {
     logger.log("decode error \(error.localizedDescription, privacy: .public)")
   }
