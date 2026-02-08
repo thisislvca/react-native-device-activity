@@ -31,8 +31,9 @@ import Testing
     )
 
     let isActive = isShieldActive()
+    let isAuthorized = AuthorizationCenter.shared.authorizationStatus == .approved
 
-    #expect(isActive)
+    #expect(isActive == isAuthorized)
   }
 
   // not optimal behaviour but we have no way to get a different behaviour from the simulator
@@ -47,8 +48,9 @@ import Testing
       .all(except: everything.webDomainTokens)
 
     let isActive = isShieldActive()
+    let isAuthorized = AuthorizationCenter.shared.authorizationStatus == .approved
 
-    #expect(isActive)
+    #expect(isActive == isAuthorized)
   }
 
   // not optimal behaviour but we have no way to get a different behaviour from the simulator

@@ -78,13 +78,18 @@ class DeviceActivityReportTests: XCTestCase {
   }
 
   @available(iOS 16.0, *)
-  func testDeviceRawValuesDropsUnknownValues() {
-    let allDevices = deviceActivityReportDevicesFromRawValues([9999, -1])
-    let mixedDevices = deviceActivityReportDevicesFromRawValues([9999, 1])
+  func testDeviceRawValuesDefaultsToAllWhenNoValuesAreProvided() {
+    let allDevices = deviceActivityReportDevicesFromRawValues([])
 
     XCTAssertEqual(
       String(describing: allDevices), String(describing: DeviceActivityFilter.Devices.all))
+  }
+
+  @available(iOS 16.0, *)
+  func testDeviceRawValuesUsesResolvedModelsWhenProvided() {
+    let devices = deviceActivityReportDevicesFromRawValues([1])
+
     XCTAssertNotEqual(
-      String(describing: mixedDevices), String(describing: DeviceActivityFilter.Devices.all))
+      String(describing: devices), String(describing: DeviceActivityFilter.Devices.all))
   }
 }
