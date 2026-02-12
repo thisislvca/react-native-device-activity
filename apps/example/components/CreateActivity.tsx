@@ -228,7 +228,7 @@ export const CreateActivity = ({ onDismiss }: { onDismiss: () => void }) => {
       />
       <TextInput
         placeholder="Enter activity name"
-        onChangeText={(text) => setActivityName(text)}
+        onChangeText={(text: string) => setActivityName(text)}
         value={activityName}
         style={{ marginVertical: 10 }}
       />

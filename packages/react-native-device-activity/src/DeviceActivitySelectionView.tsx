@@ -1,12 +1,12 @@
 import * as React from "react";
 import { View } from "react-native";
 
-import { DeviceActivitySelectionViewProps } from "./ReactNativeDeviceActivity.types";
+import type { DeviceActivitySelectionViewProps } from "./ReactNativeDeviceActivity.types";
 
 export default function DeviceActivitySelectionView({
   style,
   children,
   ...props
 }: DeviceActivitySelectionViewProps) {
-  return <View style={style}>{children}</View>;
+  return React.createElement(View, { style }, children);
 }

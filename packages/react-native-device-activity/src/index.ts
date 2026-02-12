@@ -355,14 +355,12 @@ export function getAppGroupFileDirectory(): string {
 
 export function onDeviceActivityDetected(
   listener: OnDeviceActivityDetectedListener,
-) {
+): EventSubscription {
   if (!emitter) {
     return { remove: () => {} };
   }
 
-  const handler = emitter?.addListener("onDeviceActivityDetected", listener);
-
-  return handler;
+  return emitter.addListener("onDeviceActivityDetected", listener);
 }
 
 export const useDeviceActivities = () => {
@@ -403,9 +401,8 @@ export function isShieldActive(): boolean {
 }
 
 export function isWebContentFilterPolicyActive(): boolean {
-  return (
-    ReactNativeDeviceActivityModule?.isWebContentFilterPolicyActive() ?? false
-  );
+  const fn = ReactNativeDeviceActivityModule?.isWebContentFilterPolicyActive;
+  return typeof fn === "function" ? fn() : false;
 }
 
 export function moveFile(

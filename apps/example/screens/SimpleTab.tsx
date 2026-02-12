@@ -147,7 +147,9 @@ export function SimpleTab() {
           Create Activity
         </Button>
 
-        <Title style={{ marginTop: 20 }}>Picker Views</Title>
+        <View style={{ marginTop: 20 }}>
+          <Title>Picker Views</Title>
+        </View>
         <Button
           mode="outlined"
           onPress={() => setPickerNative(true)}
